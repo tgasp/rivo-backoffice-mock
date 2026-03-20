@@ -1,0 +1,25 @@
+{
+  "name": "@backoffice/sdk-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./auth": "./src/auth/index.ts",
+    "./config": "./src/config/index.ts",
+    "./meta": "./src/meta/index.ts",
+    "./http": "./src/http/index.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "zustand": "^5.0.2"
+  }
+}
