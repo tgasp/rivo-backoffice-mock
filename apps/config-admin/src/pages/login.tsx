@@ -11,6 +11,7 @@ import {
   Input,
   Label,
 } from "@backoffice/ui";
+import type React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getAppConfig } from "../lib/app-config";
@@ -50,14 +51,18 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">CMS Portal</h1>
-          <p className="mt-1 text-sm text-muted-foreground">iGaming Platform Content Management</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Config Admin</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Master tenant controls for platform-wide configuration
+          </p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Sign in</CardTitle>
-            <CardDescription>Enter your credentials to access the CMS</CardDescription>
+            <CardDescription>
+              Enter your credentials to manage tenants and global settings
+            </CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
@@ -73,7 +78,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="editor@example.com"
+                  placeholder="config-admin@example.com"
                   autoComplete="email"
                   required
                   value={email}
@@ -97,7 +102,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in…" : "Sign in"}
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </CardFooter>
           </form>

@@ -1,6 +1,6 @@
+import type { HttpClient } from "@backoffice/sdk-core/http";
 import type { PaginatedResponse } from "@backoffice/sdk-core/types";
 import type { Player, PlayersQuery } from "./players.types";
-import type { HttpClient } from "@backoffice/sdk-core/http";
 
 export class PlayersService {
   constructor(private readonly http: HttpClient) {}

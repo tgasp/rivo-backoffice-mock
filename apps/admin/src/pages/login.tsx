@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { loginOperator } from "@backoffice/sdk-core/auth";
+import type { OperatorSession } from "@backoffice/sdk-core/types";
 import {
   Button,
   Card,
@@ -11,13 +11,18 @@ import {
   Input,
   Label,
 } from "@backoffice/ui";
-import { loginUser, useAuthStore } from "@backoffice/sdk-core/auth";
-import { getConfig } from "@backoffice/sdk-core/config";
+import type React from "react";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getAppConfig } from "../lib/app-config";
 
-export function LoginPage() {
+interface LoginPageProps {
+  onLogin: (session: OperatorSession) => void;
+}
+
+export function LoginPage({ onLogin }: LoginPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const setToken = useAuthStore((s) => s.setToken);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,9 +36,9 @@ export function LoginPage() {
     setError(null);
     setIsLoading(true);
     try {
-      const { apiBaseUrl } = getConfig();
-      const { token } = await loginUser(apiBaseUrl, { email, password });
-      setToken(token);
+      const { apiBaseUrl } = getAppConfig();
+      const session = await loginOperator(apiBaseUrl, { email, password });
+      onLogin(session);
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

@@ -1,13 +1,12 @@
-import React from "react";
+import type React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuthStore } from "@backoffice/sdk-core/auth";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  isAuthenticated: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+export function ProtectedRoute({ children, isAuthenticated }: ProtectedRouteProps) {
   const location = useLocation();
 
   if (!isAuthenticated) {

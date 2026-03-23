@@ -1,8 +1,34 @@
-export interface Tenant {
+export interface OperatorLoginRequest {
+  email: string;
+  password: string;
+  otpCode?: string;
+}
+
+export interface OperatorProfile {
   id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  roles: string[];
+  tenantId?: string;
+}
+
+export interface OperatorSession {
+  accessToken: string;
+  refreshToken: string | null;
+  expiresIn?: number;
+  tokenType: string;
+  operator?: OperatorProfile;
+}
+
+export interface TenantConfig {
+  tenantId: string;
   domain: string;
   branding: TenantBranding;
   features: FeatureFlags;
+  locale?: string;
+  registration?: Record<string, unknown>;
+  support?: Record<string, unknown>;
 }
 
 export interface TenantBranding {
@@ -29,6 +55,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ApiError {
+  status: number;
   code: string;
   message: string;
   details?: Record<string, unknown>;

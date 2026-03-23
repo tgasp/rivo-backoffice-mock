@@ -12,9 +12,9 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
       manifest: {
-        name: "Backoffice Admin",
-        short_name: "Admin",
-        description: "iGaming Platform Admin",
+        name: "Backoffice Config Admin",
+        short_name: "Config Admin",
+        description: "Master tenant backoffice for global platform configuration",
         theme_color: "#ffffff",
         icons: [
           {

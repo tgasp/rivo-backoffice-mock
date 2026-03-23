@@ -1,6 +1,6 @@
+import type { HttpClient } from "@backoffice/sdk-core/http";
 import type { PaginatedResponse } from "@backoffice/sdk-core/types";
 import type { Payment } from "./payments.types";
-import type { HttpClient } from "@backoffice/sdk-core/http";
 
 export class PaymentsService {
   constructor(private readonly http: HttpClient) {}

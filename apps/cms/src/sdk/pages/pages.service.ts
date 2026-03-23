@@ -1,6 +1,6 @@
+import type { HttpClient } from "@backoffice/sdk-core/http";
 import type { PaginatedResponse } from "@backoffice/sdk-core/types";
 import type { StaticPage } from "./pages.types";
-import type { HttpClient } from "@backoffice/sdk-core/http";
 
 export class PagesService {
   constructor(private readonly http: HttpClient) {}

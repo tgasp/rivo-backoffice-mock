@@ -1,17 +1,25 @@
-import React from "react";
+import type { TenantConfig } from "@backoffice/sdk-core/types";
 import { Button } from "@backoffice/ui";
-import { useTenantStore } from "@backoffice/sdk-core/meta";
+import React from "react";
 
-export function ContentPage() {
-  const { tenant } = useTenantStore();
+interface ContentPageProps {
+  isTenantLoading: boolean;
+  onLogout: () => Promise<void> | void;
+  tenant: TenantConfig | null;
+  tenantError: string | null;
+}
 
+export function ContentPage({ isTenantLoading, onLogout, tenant, tenantError }: ContentPageProps) {
   return (
     <div className="min-h-screen bg-background p-8">
       <h1 className="text-2xl font-bold text-foreground mb-4">CMS</h1>
-      {tenant && (
-        <p className="text-muted-foreground mb-6">Tenant: {tenant.id}</p>
-      )}
+      {isTenantLoading && <p className="text-muted-foreground mb-6">Loading tenant...</p>}
+      {tenantError && <p className="text-destructive mb-6">{tenantError}</p>}
+      {tenant && <p className="text-muted-foreground mb-6">Tenant: {tenant.tenantId}</p>}
       <Button>Manage Content</Button>
+      <Button className="ml-3" onClick={() => void onLogout()}>
+        Sign out
+      </Button>
     </div>
   );
 }

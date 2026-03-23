@@ -1,8 +1,7 @@
 import { logoutOperator } from "@backoffice/sdk-core/auth";
 import { getTenantConfig } from "@backoffice/sdk-core/tenant";
 import type { OperatorSession, TenantConfig } from "@backoffice/sdk-core/types";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/protected-route";
 import { getAppConfig } from "./lib/app-config";
@@ -11,7 +10,7 @@ import {
   getStoredOperatorSession,
   storeOperatorSession,
 } from "./lib/operator-session";
-import { DashboardPage } from "./pages/dashboard";
+import { ConfigDashboardPage } from "./pages/config-dashboard";
 import { LoginPage } from "./pages/login";
 
 export function App() {
@@ -84,7 +83,7 @@ export function App() {
           path="/"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <DashboardPage
+              <ConfigDashboardPage
                 isTenantLoading={isTenantLoading}
                 onLogout={handleLogout}
                 tenant={tenant}

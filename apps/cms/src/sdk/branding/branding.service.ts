@@ -1,5 +1,5 @@
-import type { BrandingConfig } from "./branding.types";
 import type { HttpClient } from "@backoffice/sdk-core/http";
+import type { BrandingConfig } from "./branding.types";
 
 export class BrandingService {
   constructor(private readonly http: HttpClient) {}

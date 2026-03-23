@@ -1,50 +1,57 @@
-import { create } from "zustand";
+import { HttpClient } from "../http/index.js";
+import type { OperatorLoginRequest, OperatorSession } from "../types/index.js";
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
+interface RawOperatorSession {
+  token?: string;
+  accessToken?: string;
+  refreshToken?: string | null;
+  expiresIn?: number;
+  tokenType?: string;
+  operator?: OperatorSession["operator"];
 }
 
-export interface LoginResponse {
-  token: string;
+export interface LogoutOperatorRequest {
+  refreshToken?: string | null;
 }
 
-export async function loginUser(
-  apiBaseUrl: string,
-  credentials: LoginCredentials
-): Promise<LoginResponse> {
-  const res = await fetch(`${apiBaseUrl}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentials),
-  });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error((error as { message?: string }).message ?? "Invalid credentials");
+function normalizeOperatorSession(payload: RawOperatorSession): OperatorSession {
+  const accessToken = payload.accessToken ?? payload.token;
+  if (!accessToken) {
+    throw new Error("Operator login response did not include an access token");
   }
-  return res.json() as Promise<LoginResponse>;
+
+  return {
+    accessToken,
+    refreshToken: payload.refreshToken ?? null,
+    expiresIn: payload.expiresIn,
+    tokenType: payload.tokenType ?? "Bearer",
+    operator: payload.operator,
+  };
 }
 
-export interface AuthState {
-  token: string | null;
-  isAuthenticated: boolean;
-  setToken: (token: string) => void;
-  clearToken: () => void;
+export async function loginOperator(
+  apiBaseUrl: string,
+  credentials: OperatorLoginRequest,
+  signal?: AbortSignal
+): Promise<OperatorSession> {
+  const http = new HttpClient({ baseUrl: apiBaseUrl });
+  const response = await http.post<RawOperatorSession>("/api/v1/auth/operator", credentials, {
+    signal,
+  });
+
+  return normalizeOperatorSession(response);
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: typeof window !== "undefined" ? localStorage.getItem("auth_token") : null,
-  isAuthenticated: typeof window !== "undefined" ? !!localStorage.getItem("auth_token") : false,
-  setToken: (token) => {
-    localStorage.setItem("auth_token", token);
-    set({ token, isAuthenticated: true });
-  },
-  clearToken: () => {
-    localStorage.removeItem("auth_token");
-    set({ token: null, isAuthenticated: false });
-  },
-}));
+export async function logoutOperator(
+  apiBaseUrl: string,
+  accessToken: string,
+  request: LogoutOperatorRequest = {},
+  signal?: AbortSignal
+): Promise<void> {
+  const http = new HttpClient({
+    baseUrl: apiBaseUrl,
+    getAccessToken: () => accessToken,
+  });
 
-export function getToken(): string | null {
-  return useAuthStore.getState().token;
+  await http.post<void>("/api/v1/auth/operator/logout", request, { signal });
 }

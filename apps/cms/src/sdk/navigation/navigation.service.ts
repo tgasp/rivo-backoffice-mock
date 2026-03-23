@@ -1,5 +1,5 @@
-import type { NavItem } from "./navigation.types";
 import type { HttpClient } from "@backoffice/sdk-core/http";
+import type { NavItem } from "./navigation.types";
 
 export class NavigationService {
   constructor(private readonly http: HttpClient) {}
