@@ -1,6 +1,8 @@
-import { useLogoutMutation, useSdkTenant } from "@backoffice/sdk-react";
+import { useSdkAuth, useSdkTenant } from "@backoffice/sdk-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@backoffice/ui";
-import React from "react";
+import type React from "react";
+import { Link } from "react-router-dom";
+import { AppShell } from "../components/app-shell";
 
 const quickActions = [
   "Create and activate tenants",
@@ -9,24 +11,16 @@ const quickActions = [
 ];
 
 export function ConfigDashboardPage() {
-  const logoutMutation = useLogoutMutation();
+  const { session } = useSdkAuth();
   const { tenant, tenantError } = useSdkTenant();
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">Config Admin</h1>
-          <p className="text-muted-foreground">
-            Manage the master tenant, provision partner tenants, and control shared platform
-            configuration.
-          </p>
-          {tenantError && <p className="text-sm text-destructive">{tenantError.message}</p>}
-          {tenant && (
-            <p className="text-sm text-muted-foreground">Resolved tenant: {tenant.tenantId}</p>
-          )}
-        </div>
-
+    <AppShell
+      title="Overview"
+      description="Manage the master tenant, provision partner tenants, and control shared platform configuration."
+    >
+      {tenantError && <p className="text-sm text-destructive">{tenantError.message}</p>}
+      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader>
             <CardTitle>Platform controls</CardTitle>
@@ -44,12 +38,33 @@ export function ConfigDashboardPage() {
             </div>
 
             <div className="flex gap-3">
-              <Button>Start configuring</Button>
-              <Button onClick={() => void logoutMutation.mutateAsync()}>Sign out</Button>
+              <Button asChild>
+                <Link to="/tenants">Open tenant workspace</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Session snapshot</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              <span className="font-medium text-foreground">Operator:</span>{" "}
+              {session?.operator?.email ?? "Not available"}
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Role:</span>{" "}
+              {session?.operator?.role ?? "Unknown"}
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Master tenant:</span>{" "}
+              {tenant?.tenantId ?? "Unavailable"}
+            </p>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </AppShell>
   );
 }

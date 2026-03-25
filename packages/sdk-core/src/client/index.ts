@@ -1,17 +1,25 @@
 import { loginOperator, logoutOperator, refreshOperatorSession } from "../auth/index.js";
 import { HttpClient, type HttpTransport } from "../http/index.js";
 import {
+  createTenant,
+  deleteTenant,
+  getTenant,
   getCurrentTenantConfig,
   getTenantConfig,
+  listTenants,
   resolveTenant,
+  updateTenant,
   updateCurrentTenantConfig,
 } from "../tenant/index.js";
 import type {
+  CreateTenantRequest,
   OperatorLoginRequest,
   OperatorSession,
   TenantAdminConfig,
   TenantConfig,
+  TenantRecord,
   TenantResolution,
+  UpdateTenantRequest,
   UpdateTenantAdminConfigRequest,
 } from "../types/index.js";
 
@@ -107,6 +115,58 @@ export class SdkClient {
   ): Promise<TenantAdminConfig> {
     return updateCurrentTenantConfig(this.config.baseUrl, request, {
       accessToken: this.config.getAccessToken?.() ?? undefined,
+      signal: options.signal,
+      tenantId: this.config.getTenantId?.() ?? undefined,
+      transport: this.config.transport,
+    });
+  }
+
+  listTenants(options: { signal?: unknown } = {}): Promise<TenantRecord[]> {
+    return listTenants(this.config.baseUrl, {
+      accessToken: this.config.getAccessToken?.() ?? undefined,
+      signal: options.signal,
+      tenantId: this.config.getTenantId?.() ?? undefined,
+      transport: this.config.transport,
+    });
+  }
+
+  getTenant(id: string, options: { signal?: unknown } = {}): Promise<TenantRecord> {
+    return getTenant(this.config.baseUrl, {
+      accessToken: this.config.getAccessToken?.() ?? undefined,
+      id,
+      signal: options.signal,
+      tenantId: this.config.getTenantId?.() ?? undefined,
+      transport: this.config.transport,
+    });
+  }
+
+  createTenant(request: CreateTenantRequest, options: { signal?: unknown } = {}): Promise<TenantRecord> {
+    return createTenant(this.config.baseUrl, request, {
+      accessToken: this.config.getAccessToken?.() ?? undefined,
+      signal: options.signal,
+      tenantId: this.config.getTenantId?.() ?? undefined,
+      transport: this.config.transport,
+    });
+  }
+
+  updateTenant(
+    id: string,
+    request: UpdateTenantRequest,
+    options: { signal?: unknown } = {}
+  ): Promise<TenantRecord> {
+    return updateTenant(this.config.baseUrl, request, {
+      accessToken: this.config.getAccessToken?.() ?? undefined,
+      id,
+      signal: options.signal,
+      tenantId: this.config.getTenantId?.() ?? undefined,
+      transport: this.config.transport,
+    });
+  }
+
+  deleteTenant(id: string, options: { signal?: unknown } = {}): Promise<void> {
+    return deleteTenant(this.config.baseUrl, {
+      accessToken: this.config.getAccessToken?.() ?? undefined,
+      id,
       signal: options.signal,
       tenantId: this.config.getTenantId?.() ?? undefined,
       transport: this.config.transport,

@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/runtime-config.ts","./src/vite-env.d.ts","./src/components/protected-route.tsx","./src/pages/config-dashboard.tsx","./src/pages/login.tsx"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/runtime-config.ts","./src/vite-env.d.ts","./src/components/app-shell.tsx","./src/components/protected-route.tsx","./src/pages/config-dashboard.tsx","./src/pages/login.tsx","./src/pages/tenants.tsx"],"version":"5.9.3"}

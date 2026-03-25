@@ -66,7 +66,7 @@ function getDefaultDomain(): string {
     return "localhost";
   }
 
-  return window.location.hostname;
+  return window.location.host;
 }
 
 function createBrowserTransport(): HttpTransport {

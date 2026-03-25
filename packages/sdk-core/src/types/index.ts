@@ -47,6 +47,7 @@ export interface TenantAdminConfig {
   id: string;
   name: string;
   domain: string;
+  domainAliases: string[];
   slug: string;
   branding: TenantBranding;
   settings: Record<string, unknown>;
@@ -55,9 +56,45 @@ export interface TenantAdminConfig {
   updatedAt: string;
 }
 
+export interface TenantRecord {
+  id: string;
+  name: string;
+  domain: string;
+  domainAliases: string[];
+  slug: string;
+  branding: TenantBranding;
+  settings: Record<string, unknown>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTenantRequest {
+  name: string;
+  domain: string;
+  domainAliases?: string[];
+  slug: string;
+  branding?: TenantBranding;
+  settings?: Record<string, unknown>;
+  isActive?: boolean;
+  adminEmail: string;
+  adminPassword: string;
+}
+
+export interface UpdateTenantRequest {
+  name?: string;
+  domain?: string;
+  domainAliases?: string[];
+  slug?: string;
+  branding?: TenantBranding;
+  settings?: Record<string, unknown>;
+  isActive?: boolean;
+}
+
 export interface UpdateTenantAdminConfigRequest {
   name?: string;
   branding?: TenantBranding;
+  domainAliases?: string[];
   settings?: Record<string, unknown>;
   isActive?: boolean;
 }

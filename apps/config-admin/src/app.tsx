@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/protected-route";
 import { ConfigDashboardPage } from "./pages/config-dashboard";
 import { LoginPage } from "./pages/login";
+import { TenantsPage } from "./pages/tenants";
 
 export function App() {
   const { isAuthenticated } = useSdkAuth();
@@ -31,6 +32,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <ConfigDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tenants"
+          element={
+            <ProtectedRoute>
+              <TenantsPage />
             </ProtectedRoute>
           }
         />
