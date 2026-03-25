@@ -1,0 +1,28 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps ./apps
+COPY packages ./packages
+COPY tsconfig.base.json ./
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @backoffice/sdk-core build
+RUN pnpm --filter @backoffice/config-admin build
+
+FROM nginx:1.27-alpine AS runner
+
+ENV PORT=8080
+ENV VITE_API_BASE_URL=
+ENV VITE_APP_ENV=production
+
+COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY docker/runtime/env.js.template /opt/runtime/env.js.template
+COPY docker/runtime/40-env.sh /docker-entrypoint.d/40-env.sh
+COPY --from=builder /app/apps/config-admin/dist /usr/share/nginx/html
+
+EXPOSE 8080
+

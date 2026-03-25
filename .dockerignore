@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+.turbo
+.git
+.gitignore
+dist
+coverage
+*.log
+**/node_modules
+**/dist
+**/.DS_Store
+**/tsconfig.tsbuildinfo
+
