@@ -1,5 +1,4 @@
-import { loginOperator } from "@backoffice/sdk-core/auth";
-import type { OperatorSession } from "@backoffice/sdk-core/types";
+import { useLoginMutation } from "@backoffice/sdk-react";
 import {
   Button,
   Card,
@@ -13,15 +12,11 @@ import {
 } from "@backoffice/ui";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getAppConfig } from "../lib/app-config";
 
-interface LoginPageProps {
-  onLogin: (session: OperatorSession) => void;
-}
-
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const loginMutation = useLoginMutation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,9 +30,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setError(null);
     setIsLoading(true);
     try {
-      const { apiBaseUrl } = getAppConfig();
-      const session = await loginOperator(apiBaseUrl, { email, password });
-      onLogin(session);
+      await loginMutation.mutateAsync({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

@@ -26,6 +26,9 @@ importers:
       '@backoffice/sdk-core':
         specifier: workspace:*
         version: link:../../packages/sdk-core
+      '@backoffice/sdk-react':
+        specifier: workspace:*
+        version: link:../../packages/sdk-react
       '@backoffice/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -38,9 +41,6 @@ importers:
       react-router-dom:
         specifier: ^6.28.0
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      zustand:
-        specifier: ^5.0.2
-        version: 5.0.12(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@biomejs/biome':
         specifier: '*'
@@ -81,6 +81,9 @@ importers:
       '@backoffice/sdk-core':
         specifier: workspace:*
         version: link:../../packages/sdk-core
+      '@backoffice/sdk-react':
+        specifier: workspace:*
+        version: link:../../packages/sdk-react
       '@backoffice/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -93,9 +96,6 @@ importers:
       react-router-dom:
         specifier: ^6.28.0
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      zustand:
-        specifier: ^5.0.2
-        version: 5.0.12(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@biomejs/biome':
         specifier: '*'
@@ -136,6 +136,9 @@ importers:
       '@backoffice/sdk-core':
         specifier: workspace:*
         version: link:../../packages/sdk-core
+      '@backoffice/sdk-react':
+        specifier: workspace:*
+        version: link:../../packages/sdk-react
       '@backoffice/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -148,9 +151,6 @@ importers:
       react-router-dom:
         specifier: ^6.28.0
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      zustand:
-        specifier: ^5.0.2
-        version: 5.0.12(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@biomejs/biome':
         specifier: '*'
@@ -200,14 +200,35 @@ importers:
         version: 5.9.3
 
   packages/sdk-core:
-    dependencies:
-      zustand:
-        specifier: ^5.0.2
-        version: 5.0.12(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@biomejs/biome':
         specifier: '*'
         version: 1.9.4
+      typescript:
+        specifier: '*'
+        version: 5.9.3
+
+  packages/sdk-react:
+    dependencies:
+      '@backoffice/sdk-core':
+        specifier: workspace:*
+        version: link:../sdk-core
+      '@tanstack/react-query':
+        specifier: ^5.66.8
+        version: 5.95.1(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@biomejs/biome':
+        specifier: '*'
+        version: 1.9.4
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.28
       typescript:
         specifier: '*'
         version: 5.9.3
@@ -1239,6 +1260,14 @@ packages:
 
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
+
+  '@tanstack/query-core@5.95.1':
+    resolution: {integrity: sha512-RTa+CECs9hNMDR2qH4x6bZEjXXDqnjolwecCgwk7ItW1K9WDjUrnyTrtGv4o6aZc1/6uUMkF6DWlYt78uJpgxw==}
+
+  '@tanstack/react-query@5.95.1':
+    resolution: {integrity: sha512-lqWkRuVtcz9p68/LxxKlWS+M4ACuizJUkVPZryKj0RKE8Se6TD8HU7FNy1c1Mv9C1CPBfzj/p/xiXWK9VCsKJQ==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@turbo/darwin-64@2.8.20':
     resolution: {integrity: sha512-FQ9EX1xMU5nbwjxXxM3yU88AQQ6Sqc6S44exPRroMcx9XZHqqppl5ymJF0Ig/z3nvQNwDmz1Gsnvxubo+nXWjQ==}
@@ -2526,24 +2555,6 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  zustand@5.0.12:
-    resolution: {integrity: sha512-i77ae3aZq4dhMlRhJVCYgMLKuSiZAaUPAct2AksxQ+gOtimhGMdXljRT21P5BNpeT4kXlLIckvkPM029OljD7g==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: '>=1.2.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
-
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -3536,6 +3547,13 @@ snapshots:
       json5: 2.2.3
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.12
+
+  '@tanstack/query-core@5.95.1': {}
+
+  '@tanstack/react-query@5.95.1(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.95.1
+      react: 18.3.1
 
   '@turbo/darwin-64@2.8.20':
     optional: true
@@ -5031,8 +5049,3 @@ snapshots:
       workbox-core: 7.4.0
 
   yallist@3.1.1: {}
-
-  zustand@5.0.12(@types/react@18.3.28)(react@18.3.1):
-    optionalDependencies:
-      '@types/react': 18.3.28
-      react: 18.3.1

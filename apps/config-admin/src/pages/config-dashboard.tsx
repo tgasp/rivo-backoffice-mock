@@ -1,4 +1,4 @@
-import type { TenantConfig } from "@backoffice/sdk-core/types";
+import { useLogoutMutation, useSdkTenant } from "@backoffice/sdk-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@backoffice/ui";
 import React from "react";
 
@@ -8,19 +8,10 @@ const quickActions = [
   "Review master tenant metadata",
 ];
 
-interface ConfigDashboardPageProps {
-  isTenantLoading: boolean;
-  onLogout: () => Promise<void> | void;
-  tenant: TenantConfig | null;
-  tenantError: string | null;
-}
+export function ConfigDashboardPage() {
+  const logoutMutation = useLogoutMutation();
+  const { tenant, tenantError } = useSdkTenant();
 
-export function ConfigDashboardPage({
-  isTenantLoading,
-  onLogout,
-  tenant,
-  tenantError,
-}: ConfigDashboardPageProps) {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -30,8 +21,7 @@ export function ConfigDashboardPage({
             Manage the master tenant, provision partner tenants, and control shared platform
             configuration.
           </p>
-          {isTenantLoading && <p className="text-sm text-muted-foreground">Loading tenant...</p>}
-          {tenantError && <p className="text-sm text-destructive">{tenantError}</p>}
+          {tenantError && <p className="text-sm text-destructive">{tenantError.message}</p>}
           {tenant && (
             <p className="text-sm text-muted-foreground">Resolved tenant: {tenant.tenantId}</p>
           )}
@@ -55,7 +45,7 @@ export function ConfigDashboardPage({
 
             <div className="flex gap-3">
               <Button>Start configuring</Button>
-              <Button onClick={() => void onLogout()}>Sign out</Button>
+              <Button onClick={() => void logoutMutation.mutateAsync()}>Sign out</Button>
             </div>
           </CardContent>
         </Card>

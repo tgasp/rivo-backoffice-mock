@@ -1,8 +1,9 @@
 export interface HttpClientConfig {
   baseUrl: string;
   getAccessToken?: () => string | null | undefined;
+  getTenantId?: () => string | null | undefined;
   onUnauthorized?: () => void;
-  fetch?: typeof fetch;
+  transport?: HttpTransport;
 }
 
 export type QueryValue =
@@ -13,9 +14,84 @@ export type QueryValue =
   | undefined
   | Array<string | number | boolean>;
 
-export interface RequestOptions extends Omit<RequestInit, "body"> {
-  body?: BodyInit | object | null;
+export interface ResponseHeaders {
+  get(name: string): string | null;
+}
+
+export interface TransportResponse {
+  status: number;
+  ok: boolean;
+  statusText: string;
+  headers: ResponseHeaders;
+  json(): Promise<unknown>;
+  text(): Promise<string>;
+}
+
+export interface TransportRequest {
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  body?: string | ArrayBuffer | Uint8Array;
+  credentials?: "include" | "omit" | "same-origin";
+  signal?: unknown;
+}
+
+export interface HttpTransport {
+  request(request: TransportRequest): Promise<TransportResponse>;
+}
+
+export type FetchLike = (
+  input: string,
+  init?: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string | ArrayBuffer | Uint8Array;
+    credentials?: "include" | "omit" | "same-origin";
+    signal?: unknown;
+  }
+) => Promise<TransportResponse>;
+
+export interface CreateFetchTransportOptions {
+  fetch?: FetchLike;
+}
+
+export interface RequestOptions {
+  headers?: Record<string, string>;
+  body?: string | ArrayBuffer | Uint8Array | object | null;
+  credentials?: "include" | "omit" | "same-origin";
   query?: Record<string, QueryValue>;
+  signal?: unknown;
+}
+
+interface InternalRequestOptions extends RequestOptions {
+  method?: string;
+}
+
+function getGlobalFetch(): FetchLike {
+  const maybeFetch = (globalThis as { fetch?: FetchLike }).fetch;
+  if (!maybeFetch) {
+    throw new Error(
+      "No fetch implementation is available. Pass a transport or createFetchTransport({ fetch })."
+    );
+  }
+
+  return maybeFetch;
+}
+
+export function createFetchTransport(options: CreateFetchTransportOptions = {}): HttpTransport {
+  const fetchImplementation = options.fetch ?? getGlobalFetch();
+
+  return {
+    request(request) {
+      return fetchImplementation(request.url, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        credentials: request.credentials,
+        signal: request.signal,
+      });
+    },
+  };
 }
 
 export class ApiError extends Error {
@@ -74,49 +150,51 @@ export class HttpClient {
     return url.toString();
   }
 
-  private getBody(body: RequestOptions["body"]): BodyInit | undefined {
+  private getBody(
+    body: InternalRequestOptions["body"]
+  ): string | ArrayBuffer | Uint8Array | undefined {
     if (body === undefined || body === null) {
       return undefined;
     }
 
-    if (
-      typeof body === "string" ||
-      body instanceof Blob ||
-      body instanceof FormData ||
-      body instanceof URLSearchParams ||
-      body instanceof ArrayBuffer
-    ) {
+    if (typeof body === "string" || body instanceof ArrayBuffer || body instanceof Uint8Array) {
       return body;
     }
 
     return JSON.stringify(body);
   }
 
-  private getHeaders(body: RequestOptions["body"], headers?: HeadersInit): Headers {
-    const resolvedHeaders = new Headers(headers);
+  private getHeaders(
+    body: InternalRequestOptions["body"],
+    headers?: Record<string, string>
+  ): Record<string, string> {
+    const resolvedHeaders = { ...(headers ?? {}) };
     const token = this.config.getAccessToken?.();
 
     if (token) {
-      resolvedHeaders.set("Authorization", `Bearer ${token}`);
+      resolvedHeaders.Authorization = `Bearer ${token}`;
+    }
+
+    const tenantId = this.config.getTenantId?.();
+    if (tenantId) {
+      resolvedHeaders["X-Tenant-ID"] = tenantId;
     }
 
     const hasBody = body !== undefined && body !== null;
     const isJsonBody =
       hasBody &&
-      !(body instanceof FormData) &&
-      !(body instanceof URLSearchParams) &&
-      !(body instanceof Blob) &&
       !(body instanceof ArrayBuffer) &&
+      !(body instanceof Uint8Array) &&
       typeof body !== "string";
 
-    if (isJsonBody && !resolvedHeaders.has("Content-Type")) {
-      resolvedHeaders.set("Content-Type", "application/json");
+    if (isJsonBody && !resolvedHeaders["Content-Type"]) {
+      resolvedHeaders["Content-Type"] = "application/json";
     }
 
     return resolvedHeaders;
   }
 
-  private async parseResponse<T>(res: Response): Promise<T> {
+  private async parseResponse<T>(res: TransportResponse): Promise<T> {
     if (res.status === 204) {
       return undefined as T;
     }
@@ -129,15 +207,17 @@ export class HttpClient {
     return (await res.text()) as T;
   }
 
-  private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-    const requestInit: RequestInit = {
-      ...options,
-      body: this.getBody(options.body),
-      headers: this.getHeaders(options.body, options.headers),
-    };
+  private async request<T>(path: string, options: InternalRequestOptions = {}): Promise<T> {
     const requestUrl = this.buildUrl(path, options.query);
-    const fetchImpl = this.config.fetch ?? fetch;
-    const res = await fetchImpl(requestUrl, requestInit);
+    const transport = this.config.transport ?? createFetchTransport();
+    const res = await transport.request({
+      url: requestUrl,
+      method: options.method ?? "GET",
+      body: this.getBody(options.body),
+      credentials: options.credentials,
+      headers: this.getHeaders(options.body, options.headers),
+      signal: options.signal,
+    });
 
     if (res.status === 401) {
       this.config.onUnauthorized?.();
@@ -175,14 +255,14 @@ export class HttpClient {
     return this.parseResponse<T>(res);
   }
 
-  get<T>(path: string, options: Omit<RequestOptions, "body" | "method"> = {}): Promise<T> {
+  get<T>(path: string, options: Omit<RequestOptions, "body"> = {}): Promise<T> {
     return this.request<T>(path, { ...options, method: "GET" });
   }
 
   post<T>(
     path: string,
     body?: RequestOptions["body"],
-    options: Omit<RequestOptions, "body" | "method"> = {}
+    options: Omit<RequestOptions, "body"> = {}
   ): Promise<T> {
     return this.request<T>(path, { ...options, method: "POST", body });
   }
@@ -190,7 +270,7 @@ export class HttpClient {
   put<T>(
     path: string,
     body?: RequestOptions["body"],
-    options: Omit<RequestOptions, "body" | "method"> = {}
+    options: Omit<RequestOptions, "body"> = {}
   ): Promise<T> {
     return this.request<T>(path, { ...options, method: "PUT", body });
   }
@@ -198,12 +278,12 @@ export class HttpClient {
   patch<T>(
     path: string,
     body?: RequestOptions["body"],
-    options: Omit<RequestOptions, "body" | "method"> = {}
+    options: Omit<RequestOptions, "body"> = {}
   ): Promise<T> {
     return this.request<T>(path, { ...options, method: "PATCH", body });
   }
 
-  delete<T>(path: string, options: Omit<RequestOptions, "body" | "method"> = {}): Promise<T> {
+  delete<T>(path: string, options: Omit<RequestOptions, "body"> = {}): Promise<T> {
     return this.request<T>(path, { ...options, method: "DELETE" });
   }
 }

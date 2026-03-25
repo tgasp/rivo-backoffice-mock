@@ -1,0 +1,27 @@
+{
+  "name": "@backoffice/sdk-react",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@backoffice/sdk-core": "workspace:*",
+    "@tanstack/react-query": "^5.66.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "*",
+    "@types/react": "^18.3.12",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
