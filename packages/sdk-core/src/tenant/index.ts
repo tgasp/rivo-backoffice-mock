@@ -7,6 +7,7 @@ import type {
   TenantConfig,
   TenantRecord,
   TenantResolution,
+  TenantSkin,
   UpdateTenantRequest,
   UpdateTenantAdminConfigRequest,
 } from "../types/index.js";
@@ -27,6 +28,7 @@ interface RawTenantConfig {
   features?: FeatureFlags;
   locale?: string;
   registration?: Record<string, unknown>;
+  skin?: TenantSkin;
   support?: Record<string, unknown>;
 }
 
@@ -37,6 +39,7 @@ interface RawTenantAdminConfig {
   domainAliases?: string[];
   slug?: string;
   branding?: TenantBranding;
+  skin?: TenantSkin;
   settings?: Record<string, unknown>;
   isActive?: boolean;
   createdAt?: string;
@@ -94,6 +97,7 @@ function normalizeTenantConfig(payload: RawTenantConfig): TenantConfig {
     features: payload.features ?? {},
     locale: payload.locale,
     registration: payload.registration,
+    skin: payload.skin ?? {},
     support: payload.support,
   };
 }
@@ -114,6 +118,7 @@ function normalizeTenantAdminConfig(payload: RawTenantAdminConfig): TenantAdminC
     domainAliases: payload.domainAliases ?? [],
     slug: payload.slug,
     branding: payload.branding ?? {},
+    skin: payload.skin ?? {},
     settings: payload.settings ?? {},
     isActive: payload.isActive ?? false,
     createdAt: payload.createdAt,

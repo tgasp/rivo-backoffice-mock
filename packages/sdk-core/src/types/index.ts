@@ -40,6 +40,7 @@ export interface TenantConfig {
   features: FeatureFlags;
   locale?: string;
   registration?: Record<string, unknown>;
+  skin: TenantSkin;
   support?: Record<string, unknown>;
 }
 
@@ -50,6 +51,7 @@ export interface TenantAdminConfig {
   domainAliases: string[];
   slug: string;
   branding: TenantBranding;
+  skin: TenantSkin;
   settings: Record<string, unknown>;
   isActive: boolean;
   createdAt: string;
@@ -63,6 +65,7 @@ export interface TenantRecord {
   domainAliases: string[];
   slug: string;
   branding: TenantBranding;
+  skin: TenantSkin;
   settings: Record<string, unknown>;
   isActive: boolean;
   createdAt: string;
@@ -75,6 +78,7 @@ export interface CreateTenantRequest {
   domainAliases?: string[];
   slug: string;
   branding?: TenantBranding;
+  skin?: TenantSkin;
   settings?: Record<string, unknown>;
   isActive?: boolean;
   adminEmail: string;
@@ -87,6 +91,7 @@ export interface UpdateTenantRequest {
   domainAliases?: string[];
   slug?: string;
   branding?: TenantBranding;
+  skin?: TenantSkin;
   settings?: Record<string, unknown>;
   isActive?: boolean;
 }
@@ -95,6 +100,7 @@ export interface UpdateTenantAdminConfigRequest {
   name?: string;
   branding?: TenantBranding;
   domainAliases?: string[];
+  skin?: TenantSkin;
   settings?: Record<string, unknown>;
   isActive?: boolean;
 }
@@ -119,6 +125,10 @@ export interface TenantBranding {
 
 export interface FeatureFlags {
   [key: string]: boolean;
+}
+
+export interface TenantSkin {
+  [key: string]: string;
 }
 
 export interface ApiResponse<T> {

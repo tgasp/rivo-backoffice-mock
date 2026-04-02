@@ -18,6 +18,7 @@ interface TenantFormState {
   primaryColor: string;
   secondaryColor: string;
   faviconUrl: string;
+  skinText: string;
   adminEmail: string;
   adminPassword: string;
   settingsText: string;
@@ -33,6 +34,7 @@ const emptyForm: TenantFormState = {
   primaryColor: "",
   secondaryColor: "",
   faviconUrl: "",
+  skinText: "{}",
   adminEmail: "",
   adminPassword: "",
   settingsText: "{}",
@@ -53,6 +55,7 @@ function getTenantFormState(tenant: TenantRecord | null): TenantFormState {
     primaryColor: tenant.branding.primaryColor ?? tenant.branding.colors?.primary ?? "",
     secondaryColor: tenant.branding.secondaryColor ?? tenant.branding.colors?.secondary ?? "",
     faviconUrl: tenant.branding.faviconUrl ?? tenant.branding.favicon ?? "",
+    skinText: JSON.stringify(tenant.skin ?? {}, null, 2),
     adminEmail: "",
     adminPassword: "",
     settingsText: JSON.stringify(tenant.settings ?? {}, null, 2),
@@ -160,6 +163,7 @@ export function TenantsPage() {
     setIsSaving(true);
 
     let settings: Record<string, unknown>;
+    let skin: Record<string, string>;
     const domainAliases = formState.domainAliasesText
       .split(/\r?\n|,/)
       .map((value) => value.trim())
@@ -168,6 +172,14 @@ export function TenantsPage() {
       settings = JSON.parse(formState.settingsText) as Record<string, unknown>;
     } catch {
       setError("Settings must be valid JSON.");
+      setIsSaving(false);
+      return;
+    }
+
+    try {
+      skin = JSON.parse(formState.skinText) as Record<string, string>;
+    } catch {
+      setError("Skin must be valid JSON.");
       setIsSaving(false);
       return;
     }
@@ -185,6 +197,7 @@ export function TenantsPage() {
             secondaryColor: formState.secondaryColor || undefined,
             faviconUrl: formState.faviconUrl || undefined,
           },
+          skin,
           settings,
           isActive: formState.isActive,
         };
@@ -204,6 +217,7 @@ export function TenantsPage() {
             secondaryColor: formState.secondaryColor || undefined,
             faviconUrl: formState.faviconUrl || undefined,
           },
+          skin,
           settings,
           isActive: formState.isActive,
           adminEmail: formState.adminEmail,
@@ -464,6 +478,20 @@ export function TenantsPage() {
                   </div>
                 </div>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="tenant-skin">Skin JSON</Label>
+                <textarea
+                  id="tenant-skin"
+                  className="min-h-64 w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                  value={formState.skinText}
+                  onChange={(event) => updateForm("skinText", event.target.value)}
+                  spellCheck={false}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Theme tokens that the frontoffice will consume directly from `tenants/config`.
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tenant-settings">Settings JSON</Label>

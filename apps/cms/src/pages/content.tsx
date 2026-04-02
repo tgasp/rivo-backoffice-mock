@@ -25,6 +25,7 @@ export function ContentPage() {
   const [faviconUrl, setFaviconUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState("");
   const [secondaryColor, setSecondaryColor] = useState("");
+  const [skinText, setSkinText] = useState("{}");
   const [settingsText, setSettingsText] = useState("{}");
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -50,6 +51,7 @@ export function ContentPage() {
         tenantAdminConfig.branding.colors?.secondary ??
         ""
     );
+    setSkinText(formatJson(tenantAdminConfig.skin));
     setSettingsText(formatJson(tenantAdminConfig.settings));
   }, [tenantAdminConfig]);
 
@@ -69,10 +71,18 @@ export function ContentPage() {
     setSuccessMessage(null);
 
     let parsedSettings: Record<string, unknown>;
+    let parsedSkin: Record<string, string>;
     try {
       parsedSettings = JSON.parse(settingsText) as Record<string, unknown>;
     } catch {
       setFormError("Settings must be valid JSON before they can be saved.");
+      return;
+    }
+
+    try {
+      parsedSkin = JSON.parse(skinText) as Record<string, string>;
+    } catch {
+      setFormError("Skin must be valid JSON before it can be saved.");
       return;
     }
 
@@ -86,6 +96,7 @@ export function ContentPage() {
           primaryColor: primaryColor || undefined,
           secondaryColor: secondaryColor || undefined,
         },
+        skin: parsedSkin,
         settings: parsedSettings,
       });
       setSuccessMessage("Tenant configuration saved.");
@@ -303,6 +314,20 @@ export function ContentPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="tenant-skin">Skin JSON</Label>
+                  <textarea
+                    id="tenant-skin"
+                    className="min-h-64 w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                    value={skinText}
+                    onChange={(event) => setSkinText(event.target.value)}
+                    spellCheck={false}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Theme tokens returned by the tenant config API.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="tenant-settings">Runtime settings JSON</Label>
                   <textarea
                     id="tenant-settings"
@@ -346,6 +371,7 @@ export function ContentPage() {
                           tenantAdminConfig.branding.colors?.secondary ??
                           ""
                       );
+                      setSkinText(formatJson(tenantAdminConfig.skin));
                       setSettingsText(formatJson(tenantAdminConfig.settings));
                       setFormError(null);
                       setSuccessMessage(null);
